@@ -13,10 +13,21 @@ const DEFAULT_STATE: StateFile = {};
 export async function readState(statePath: string): Promise<StateFile> {
   try {
     const raw = await fs.readFile(statePath, "utf-8");
-    const parsed = JSON.parse(raw) as StateFile;
-    return parsed ?? DEFAULT_STATE;
+
+    if (!raw.trim()) {
+      // empty file → treat as fresh state
+      return { ...DEFAULT_STATE };
+    }
+
+    return JSON.parse(raw) as StateFile;
   } catch (err: any) {
     if (err?.code === "ENOENT") return { ...DEFAULT_STATE };
+
+    // If JSON is invalid, treat it as fresh state instead of crashing
+    if (err instanceof SyntaxError) {
+      return { ...DEFAULT_STATE };
+    }
+
     throw err;
   }
 }
