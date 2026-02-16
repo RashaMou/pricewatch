@@ -35,11 +35,12 @@ function buildGarminUrl(config: GarminConfig) {
 }
 
 function parseGarminSnapshot(json: GarminPriceResponse): Snapshot {
-  const onSale = json.salePrice !== null;
+  const list = json.listPrice.price;
+  const current = json.salePrice?.price ?? list;
+
   return {
-    onSale,
-    currentPrice: onSale ? json.salePrice!.price : json.listPrice.price,
-    listPrice: json.listPrice.price,
+    currentPrice: current,
+    listPrice: list,
     currency: json.listPrice.currencyCode,
   };
 }

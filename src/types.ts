@@ -1,9 +1,8 @@
 import { z } from "zod";
 
 export type Snapshot = {
-  onSale: boolean;
-  currentPrice?: number;
-  listPrice?: number;
+  currentPrice: number;
+  listPrice: number;
   currency?: string;
 };
 

@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { loadWatches } from "../lib/config.js";
 import { providers } from "../providers/index.js";
 import type { Snapshot } from "../types.js";
+import { isOnSale } from "../rules/anySale.js";
 
 function isProviderKey(x: string): x is keyof typeof providers {
   return x in providers;
@@ -44,21 +45,19 @@ export function runCommand(program: Command) {
           });
 
           const result: Snapshot = await provider.fetch(typedConfig);
+          const onSale = isOnSale(result);
 
           console.log(chalk.bold.white(watch.id));
           console.log("   Provider:", chalk.green(watch.provider));
           console.log(
             "   On Sale:",
-            result.onSale ? chalk.green("YES") : chalk.gray("no"),
+            onSale ? chalk.green("YES") : chalk.gray("no"),
           );
 
           if (result.currentPrice !== undefined) {
-            const priceLine =
-              result.listPrice && result.listPrice !== result.currentPrice
-                ? `${result.currentPrice} (${chalk.strikethrough(
-                    String(result.listPrice),
-                  )})`
-                : String(result.currentPrice);
+            const priceLine = onSale
+              ? `${result.currentPrice} (${chalk.strikethrough(String(result.listPrice))})`
+              : String(result.currentPrice);
 
             console.log(
               "   Price:",
