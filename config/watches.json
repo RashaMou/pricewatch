@@ -8,15 +8,5 @@
     "rule": {
       "type": "anySale"
     }
-  },
-  {
-    "id": "dive-rite-backplate",
-    "provider": "scuba.com",
-    "config": {
-      "sku": "DIV2116"
-    },
-    "rule": {
-      "type": "anySale"
-    }
   }
 ]

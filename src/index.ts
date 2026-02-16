@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { registerCommands } from "./commands/index.js";
+import "dotenv/config";
 
 const program = new Command();
 

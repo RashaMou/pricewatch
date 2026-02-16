@@ -29,3 +29,4 @@ export function writeJsonFile(filename: string, data: unknown) {
 }
 
 export const loadWatches = () => readJsonFile<WatchConfig[]>("watches.json");
+export const loadProviderUrls = () => readJsonFile<any>("providerUrls.json");

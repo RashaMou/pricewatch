@@ -1,6 +1,19 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { loadWatches } from "../lib/config.js";
+import type { WatchRule } from "../types.js";
+
+function formatRule(rule: WatchRule): string {
+  if (rule.type === "belowPrice") return `${rule.type} (${rule.value})`;
+  return rule.type; // anySale
+}
+
+function entriesForUnknownConfig(config: unknown): [string, unknown][] {
+  if (config && typeof config === "object" && !Array.isArray(config)) {
+    return Object.entries(config as Record<string, unknown>);
+  }
+  return [];
+}
 
 export function listWatchesCommand(program: Command) {
   program
@@ -24,19 +37,16 @@ export function listWatchesCommand(program: Command) {
         console.log(`${number} ${id}`);
         console.log(`   ${chalk.dim("Provider:")} ${provider}`);
 
-        // Print provider-specific config fields (nicely)
-        Object.entries(watch.config).forEach(([key, value]) => {
+        for (const [key, value] of entriesForUnknownConfig(watch.config)) {
           console.log(
             `   ${chalk.dim(`${key}:`)} ${chalk.blue(String(value))}`,
           );
-        });
+        }
 
         if (watch.rule) {
-          const ruleText = watch.rule.value
-            ? `${watch.rule.type} (${watch.rule.value})`
-            : watch.rule.type;
-
-          console.log(`   ${chalk.dim("Rule:")} ${chalk.magenta(ruleText)}`);
+          console.log(
+            `   ${chalk.dim("Rule:")} ${chalk.magenta(formatRule(watch.rule))}`,
+          );
         }
 
         console.log();

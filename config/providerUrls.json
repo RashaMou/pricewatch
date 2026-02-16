@@ -4,8 +4,5 @@
     "defaultQuery": {
       "country": "US"
     }
-  },
-  "scuba.com": {
-    "template": "https://www.scuba.com/api/products-v2/views/listing/{sku}"
   }
 }
