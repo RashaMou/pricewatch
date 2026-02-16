@@ -1,0 +1,30 @@
+{
+  "name": "pricewatcher",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "watch": "./bin/watch.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node bin/watch.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.29.1",
+  "type": "module",
+  "devDependencies": {
+    "tsc": "^2.0.4",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "commander": "^14.0.3"
+  }
+}
