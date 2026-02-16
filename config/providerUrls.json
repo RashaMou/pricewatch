@@ -1,8 +1,11 @@
 {
   "garmin": {
+    "type": "rest",
     "template": "https://buy.garmin.com/pricing-proxy-services/countries/{country}/skus/{sku}/price",
-    "defaultQuery": {
-      "country": "US"
+    "defaults": {
+      "params": {
+        "country": "US"
+      }
     }
   }
 }

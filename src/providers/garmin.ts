@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { loadProviderUrls } from "../lib/config.js";
 import type { Provider, Snapshot } from "../types.js";
+import { fetchJson } from "../lib/http.js";
+import { applyTemplate, toQueryString } from "../lib/urlTemplate.js";
 
 export const GarminConfigSchema = z.object({
   sku: z.string().min(1),
@@ -12,47 +14,44 @@ export type GarminConfig = z.infer<typeof GarminConfigSchema>;
 
 const providerUrls = loadProviderUrls();
 
+type GarminPriceResponse = {
+  salePrice: null | { price: number };
+  listPrice: { price: number; currencyCode: string };
+};
+
+function buildGarminUrl(config: GarminConfig) {
+  const template = providerUrls.garmin.template;
+  const defaults = providerUrls.garmin.defaultQuery ?? {};
+
+  const country = config.country ?? defaults.country ?? "US";
+  const locale = config.locale ?? defaults.locale ?? "en-US";
+  const customerGroup =
+    config.customerGroup ?? defaults.customerGroup ?? "none";
+
+  const baseUrl = applyTemplate(template, { country, sku: config.sku });
+
+  const qs = toQueryString({ locale, customerGroup });
+  return `${baseUrl}${qs}`;
+}
+
+function parseGarminSnapshot(json: GarminPriceResponse): Snapshot {
+  const onSale = json.salePrice !== null;
+  return {
+    onSale,
+    currentPrice: onSale ? json.salePrice!.price : json.listPrice.price,
+    listPrice: json.listPrice.price,
+    currency: json.listPrice.currencyCode,
+  };
+}
+
 export const garminProvider: Provider<GarminConfig> = {
   schema: GarminConfigSchema,
 
   async fetch(config): Promise<Snapshot> {
-    const template = providerUrls.garmin.template;
-    const defaults = providerUrls.garmin.defaultQuery ?? {};
+    const url = buildGarminUrl(config);
 
-    const country = config.country ?? defaults.country ?? "US";
-    const locale = config.locale ?? defaults.locale ?? "en-US";
-    const customerGroup =
-      config.customerGroup ?? defaults.customerGroup ?? "none";
+    const json = await fetchJson<GarminPriceResponse>(url);
 
-    const baseUrl = template
-      .replace("{country}", country)
-      .replace("{sku}", config.sku);
-
-    const url = `${baseUrl}?locale=${locale}&customerGroup=${customerGroup}`;
-
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        Accept: "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        Connection: "keep-alive",
-        "Sec-Fetch-Site": "none",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Dest": "document",
-      },
-    });
-    if (!res.ok) throw new Error(`Garmin request failed (${res.status})`);
-
-    const json = await res.json();
-
-    const onSale = json.salePrice !== null;
-
-    return {
-      onSale,
-      currentPrice: onSale ? json.salePrice.price : json.listPrice.price,
-      listPrice: json.listPrice.price,
-      currency: json.listPrice.currencyCode,
-    };
+    return parseGarminSnapshot(json);
   },
 };
