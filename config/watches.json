@@ -1,1 +1,22 @@
-watch list
+[
+  {
+    "id": "garmin-descent-g2",
+    "provider": "garmin",
+    "config": {
+      "sku": "010-02986-01"
+    },
+    "rule": {
+      "type": "anySale"
+    }
+  },
+  {
+    "id": "dive-rite-backplate",
+    "provider": "scuba.com",
+    "config": {
+      "sku": "DIV2116"
+    },
+    "rule": {
+      "type": "anySale"
+    }
+  }
+]

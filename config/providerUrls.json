@@ -1,1 +1,11 @@
-endpoint templates + defaults
+{
+  "garmin": {
+    "template": "https://buy.garmin.com/pricing-proxy-services/countries/{country}/skus/{sku}/price",
+    "defaultQuery": {
+      "country": "US"
+    }
+  },
+  "scuba.com": {
+    "template": "https://www.scuba.com/api/products-v2/views/listing/{sku}"
+  }
+}
