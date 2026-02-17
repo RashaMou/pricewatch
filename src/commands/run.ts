@@ -5,8 +5,14 @@ import { providers } from "../providers/index.js";
 import type { Snapshot } from "../types.js";
 import { isOnSale } from "../rules/anySale.js";
 import { readState, writeState } from "../lib/state.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const STATE_PATH = "data/state.json";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const ROOT = path.resolve(__dirname, "../../");
+const STATE_PATH = path.join(ROOT, "data", "state.json");
 
 // move to sepatate module later
 type NotifyEvent =
